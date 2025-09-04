@@ -1,0 +1,145 @@
+
+openapi: 3.0.3
+info:
+  title: Agentic Portfolio Platform
+  version: 1.0.0
+  description: >
+    Contracts-first APIs for the Agentic AI Portfolio Manager (brokerless).
+    Generated 2025-08-29. Security is JWT bearer. Errors follow RFC7807 (problem+json).
+servers:
+  - url: http://localhost:8080
+    description: API Gateway (local)
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Problem:
+      type: object
+      properties:
+        type: {"type":"string","format":"uri"}
+        title: {"type":"string"}
+        status: {"type":"integer"}
+        detail: {"type":"string"}
+        instance: {"type":"string","format":"uri"}
+    Candle:
+      type: object
+      required: [ts, open, high, low, close, volume, symbol, tf, venue]
+      properties:
+        ts: { type: string, format: date-time }
+        open: { type: number }
+        high: { type: number }
+        low: { type: number }
+        close: { type: number }
+        volume: { type: number }
+        symbol: { type: string }
+        tf: { type: string, example: "1d" }
+        venue: { type: string, example: "NASDAQ" }
+    KPI:
+      type: object
+      properties:
+        pnl: { type: number }
+        sharpe: { type: number }
+        drawdown: { type: number }
+        gross: { type: number }
+        net: { type: number }
+    Position:
+      type: object
+      properties:
+        symbol: { type: string }
+        qty: { type: number }
+        avg_price: { type: number }
+        side: { type: string, enum: ["LONG","SHORT"] }
+        opened_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    Watchlist:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        user_id: { type: string, format: uuid }
+        created_at: { type: string, format: date-time }
+security:
+  - bearerAuth: []
+
+
+
+
+paths:
+  /api/orders:
+    post:
+      summary: Create order intents (brokerless maps to simulation)
+      parameters:
+        - in: header
+          name: Idempotency-Key
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [portfolio_id, orders]
+              properties:
+                portfolio_id: { type: string, format: uuid }
+                orders:
+                  type: array
+                  items:
+                    type: object
+                    required: [symbol, side, qty, order_type]
+                    properties:
+                      symbol: { type: string }
+                      side: { type: string, enum: [BUY, SELL] }
+                      qty: { type: number }
+                      order_type: { type: string, enum: [MARKET, LIMIT] }
+                      limit_price: { type: number }
+      responses:
+        "202": { description: Order intents accepted }
+  /api/orders:
+    get:
+      summary: List order intents by portfolio
+      parameters:
+        - in: query
+          name: portfolio_id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Order intents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id: { type: string, format: uuid }
+                    symbol: { type: string }
+                    side: { type: string }
+                    qty: { type: number }
+                    order_type: { type: string }
+                    status: { type: string }
+  /api/orders/{id}:
+    get:
+      summary: Get order intent detail
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Order intent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: { type: string, format: uuid }
+                  symbol: { type: string }
+                  side: { type: string }
+                  qty: { type: number }
+                  order_type: { type: string }
+                  status: { type: string }

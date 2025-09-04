@@ -1,0 +1,6 @@
+com\agentic\portfoliomanager\portfolio\model\Candle.class
+com\agentic\portfoliomanager\portfolio\model\KPI.class
+com\agentic\portfoliomanager\portfolio\controller\PortfolioController.class
+com\agentic\portfoliomanager\portfolio\model\Watchlist.class
+com\agentic\portfoliomanager\portfolio\PortfolioApplication.class
+com\agentic\portfoliomanager\portfolio\model\Position.class

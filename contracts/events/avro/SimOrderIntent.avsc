@@ -1,0 +1,76 @@
+{
+  "type": "record",
+  "name": "SimOrderIntent",
+  "namespace": "portfolio.events",
+  "fields": [
+    {
+      "name": "portfolio_id",
+      "type": "string"
+    },
+    {
+      "name": "orders",
+      "type": {
+        "type": "array",
+        "items": {
+          "type": "record",
+          "name": "Order",
+          "fields": [
+            {
+              "name": "symbol",
+              "type": "string"
+            },
+            {
+              "name": "side",
+              "type": {
+                "type": "enum",
+                "name": "Side",
+                "symbols": [
+                  "BUY",
+                  "SELL"
+                ]
+              }
+            },
+            {
+              "name": "qty",
+              "type": "double"
+            },
+            {
+              "name": "order_type",
+              "type": {
+                "type": "enum",
+                "name": "OrderType",
+                "symbols": [
+                  "MARKET",
+                  "LIMIT"
+                ]
+              }
+            },
+            {
+              "name": "limit_price",
+              "type": [
+                "null",
+                "double"
+              ],
+              "default": null
+            },
+            {
+              "name": "tif",
+              "type": [
+                "null",
+                "string"
+              ],
+              "default": null
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "requested_at",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    }
+  ]
+}

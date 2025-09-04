@@ -1,0 +1,163 @@
+
+openapi: 3.0.3
+info:
+  title: Agentic Portfolio Platform
+  version: 1.0.0
+  description: >
+    Contracts-first APIs for the Agentic AI Portfolio Manager (brokerless).
+    Generated 2025-08-29. Security is JWT bearer. Errors follow RFC7807 (problem+json).
+servers:
+  - url: http://localhost:8080
+    description: API Gateway (local)
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Problem:
+      type: object
+      properties:
+        type: {"type":"string","format":"uri"}
+        title: {"type":"string"}
+        status: {"type":"integer"}
+        detail: {"type":"string"}
+        instance: {"type":"string","format":"uri"}
+    Candle:
+      type: object
+      required: [ts, open, high, low, close, volume, symbol, tf, venue]
+      properties:
+        ts: { type: string, format: date-time }
+        open: { type: number }
+        high: { type: number }
+        low: { type: number }
+        close: { type: number }
+        volume: { type: number }
+        symbol: { type: string }
+        tf: { type: string, example: "1d" }
+        venue: { type: string, example: "NASDAQ" }
+    KPI:
+      type: object
+      properties:
+        pnl: { type: number }
+        sharpe: { type: number }
+        drawdown: { type: number }
+        gross: { type: number }
+        net: { type: number }
+    Position:
+      type: object
+      properties:
+        symbol: { type: string }
+        qty: { type: number }
+        avg_price: { type: number }
+        side: { type: string, enum: ["LONG","SHORT"] }
+        opened_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    Watchlist:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        user_id: { type: string, format: uuid }
+        created_at: { type: string, format: date-time }
+security:
+  - bearerAuth: []
+
+
+paths:
+  /api/simulate/rebalance:
+    post:
+      summary: Create simulated orders to reach target weights
+      parameters:
+        - in: header
+          name: Idempotency-Key
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [portfolio_id, targets]
+              properties:
+                portfolio_id: { type: string, format: uuid }
+                targets:
+                  type: array
+                  items:
+                    type: object
+                    required: [symbol, weight]
+                    properties:
+                      symbol: { type: string }
+                      weight: { type: number, description: target portfolio weight (0..1) }
+      responses:
+        "202": { description: Orders created (simulated) }
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema: { $ref: "#/components/schemas/Problem" }
+  /api/simulate/orders:
+    post:
+      summary: Submit explicit simulated orders
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [portfolio_id, orders]
+              properties:
+                portfolio_id: { type: string, format: uuid }
+                orders:
+                  type: array
+                  items:
+                    type: object
+                    required: [symbol, side, qty, order_type]
+                    properties:
+                      symbol: { type: string }
+                      side: { type: string, enum: [BUY, SELL] }
+                      qty: { type: number }
+                      order_type: { type: string, enum: [MARKET, LIMIT] }
+                      limit_price: { type: number }
+      responses:
+        "202": { description: Sim orders accepted }
+  /api/sim/ledger:
+    get:
+      summary: Read simulated ledger (fills & PnL)
+      parameters:
+        - in: query
+          name: portfolio_id
+          schema: { type: string, format: uuid }
+        - in: query
+          name: window
+          schema: { type: string, example: "30d" }
+      responses:
+        "200":
+          description: Ledger entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    order_id: { type: string, format: uuid }
+                    symbol: { type: string }
+                    fill_price: { type: number }
+                    filled_qty: { type: number }
+                    ts: { type: string, format: date-time }
+  /api/fill-models:
+    post:
+      summary: Register or select fill models
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                params: { type: object }
+      responses:
+        "200": { description: OK }

@@ -1,0 +1,50 @@
+{
+  "type": "record",
+  "name": "SignalEnsemble",
+  "namespace": "portfolio.events",
+  "fields": [
+    {
+      "name": "portfolio_id",
+      "type": "string"
+    },
+    {
+      "name": "targets",
+      "type": {
+        "type": "array",
+        "items": {
+          "type": "record",
+          "name": "Target",
+          "fields": [
+            {
+              "name": "symbol",
+              "type": "string"
+            },
+            {
+              "name": "weight",
+              "type": "double"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "method",
+      "type": "string"
+    },
+    {
+      "name": "metrics",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null
+    },
+    {
+      "name": "asof",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    }
+  ]
+}

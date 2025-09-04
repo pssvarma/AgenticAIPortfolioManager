@@ -1,0 +1,46 @@
+{
+  "type": "record",
+  "name": "SimOrderFilled",
+  "namespace": "portfolio.events",
+  "fields": [
+    {
+      "name": "order_id",
+      "type": "string"
+    },
+    {
+      "name": "symbol",
+      "type": "string"
+    },
+    {
+      "name": "filled_qty",
+      "type": "double"
+    },
+    {
+      "name": "fill_price",
+      "type": "double"
+    },
+    {
+      "name": "ts",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    },
+    {
+      "name": "model",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null
+    },
+    {
+      "name": "slippage_bps",
+      "type": [
+        "null",
+        "double"
+      ],
+      "default": null
+    }
+  ]
+}

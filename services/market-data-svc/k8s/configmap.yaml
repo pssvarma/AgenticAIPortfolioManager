@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: market-data-svc-config
+data:
+  SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/portfolio
+  SPRING_FLYWAY_LOCATIONS: classpath:db/migration
+  SPRING_JPA_HIBERNATE_DDL_AUTO: validate

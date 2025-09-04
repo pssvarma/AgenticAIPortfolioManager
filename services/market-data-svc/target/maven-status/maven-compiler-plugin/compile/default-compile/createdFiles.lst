@@ -1,0 +1,15 @@
+com\agentic\portfoliomanager\api\ApiUtil.class
+com\agentic\portfoliomanager\model\Problem.class
+com\agentic\portfoliomanager\model\Position$SideEnum.class
+com\agentic\portfoliomanager\controller\MarketDataController.class
+com\agentic\portfoliomanager\entity\Candle.class
+com\agentic\portfoliomanager\marketdata\controller\MarketDataController.class
+com\agentic\portfoliomanager\marketdata\model\Candle.class
+com\agentic\portfoliomanager\model\Watchlist.class
+com\agentic\portfoliomanager\model\KPI.class
+com\agentic\portfoliomanager\entity\CandleId.class
+com\agentic\portfoliomanager\model\Position.class
+com\agentic\portfoliomanager\repository\CandleRepository.class
+com\agentic\portfoliomanager\api\ApiApi.class
+com\agentic\portfoliomanager\model\Candle.class
+com\agentic\portfoliomanager\MarketDataSvcApplication.class

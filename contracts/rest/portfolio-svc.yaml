@@ -1,0 +1,206 @@
+
+openapi: 3.0.3
+info:
+  title: Agentic Portfolio Platform
+  version: 1.0.0
+  description: >
+    Contracts-first APIs for the Agentic AI Portfolio Manager (brokerless).
+    Generated 2025-08-29. Security is JWT bearer. Errors follow RFC7807 (problem+json).
+servers:
+  - url: http://localhost:8080
+    description: API Gateway (local)
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Problem:
+      type: object
+      properties:
+        type: {"type":"string","format":"uri"}
+        title: {"type":"string"}
+        status: {"type":"integer"}
+        detail: {"type":"string"}
+        instance: {"type":"string","format":"uri"}
+    Candle:
+      type: object
+      required: [ts, open, high, low, close, volume, symbol, tf, venue]
+      properties:
+        ts: { type: string, format: date-time }
+        open: { type: number }
+        high: { type: number }
+        low: { type: number }
+        close: { type: number }
+        volume: { type: number }
+        symbol: { type: string }
+        tf: { type: string, example: "1d" }
+        venue: { type: string, example: "NASDAQ" }
+    KPI:
+      type: object
+      properties:
+        pnl: { type: number }
+        sharpe: { type: number }
+        drawdown: { type: number }
+        gross: { type: number }
+        net: { type: number }
+    Position:
+      type: object
+      properties:
+        symbol: { type: string }
+        qty: { type: number }
+        avg_price: { type: number }
+        side: { type: string, enum: ["LONG","SHORT"] }
+        opened_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    Watchlist:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        user_id: { type: string, format: uuid }
+        created_at: { type: string, format: date-time }
+security:
+  - bearerAuth: []
+
+
+paths:
+  /api/portfolio:
+    get:
+      summary: List portfolios
+      responses:
+        "200":
+          description: Portfolios
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id: { type: string, format: uuid }
+                    name: { type: string }
+                    base_ccy: { type: string }
+                    created_at: { type: string, format: date-time }
+    post:
+      summary: Create portfolio
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, base_ccy]
+              properties:
+                name: { type: string }
+                base_ccy: { type: string, example: "USD" }
+      responses:
+        "201":
+          description: Created
+  /api/portfolio/{id}/positions:
+    get:
+      summary: Positions for portfolio
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Positions
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Position" }
+  /api/portfolio/{id}/kpis:
+    get:
+      summary: KPIs for portfolio
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+        - in: query
+          name: window
+          schema: { type: string, example: "30d" }
+      responses:
+        "200":
+          description: KPI snapshot
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/KPI" }
+  /api/watchlists:
+    get:
+      summary: List watchlists
+      responses:
+        "200":
+          description: Watchlists
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Watchlist" }
+    post:
+      summary: Create watchlist
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name: { type: string }
+      responses:
+        "201": { description: Created }
+  /api/watchlists/{id}:
+    get:
+      summary: Get watchlist
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Watchlist
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Watchlist" }
+  /api/watchlists/{id}/symbols:
+    get:
+      summary: List symbols in watchlist
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: Symbols
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { type: string }
+    post:
+      summary: Add symbols to watchlist
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                symbols:
+                  type: array
+                  items: { type: string }
+      responses:
+        "200": { description: Updated }

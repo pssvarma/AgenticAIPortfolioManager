@@ -1,0 +1,4 @@
+com\agentic\portfoliomanager\backtest\model\BacktestRunDetail.class
+com\agentic\portfoliomanager\backtest\controller\BacktestController.class
+com\agentic\portfoliomanager\backtest\BacktestApplication.class
+com\agentic\portfoliomanager\backtest\model\BacktestRun.class

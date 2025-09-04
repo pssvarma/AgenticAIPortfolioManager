@@ -1,0 +1,8 @@
+com\agentic\portfoliomanager\riskcompliance\controller\RiskComplianceController.class
+com\agentic\portfoliomanager\riskcompliance\model\Rule.class
+com\agentic\portfoliomanager\riskcompliance\model\Attestation.class
+com\agentic\portfoliomanager\riskcompliance\model\RiskCheckResponse.class
+com\agentic\portfoliomanager\riskcompliance\RiskComplianceApplication.class
+com\agentic\portfoliomanager\riskcompliance\model\Blacklist.class
+com\agentic\portfoliomanager\riskcompliance\model\Intent.class
+com\agentic\portfoliomanager\riskcompliance\model\RiskCheckRequest.class

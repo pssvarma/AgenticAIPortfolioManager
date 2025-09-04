@@ -1,0 +1,130 @@
+
+openapi: 3.0.3
+info:
+  title: Agentic Portfolio Platform
+  version: 1.0.0
+  description: >
+    Contracts-first APIs for the Agentic AI Portfolio Manager (brokerless).
+    Generated 2025-08-29. Security is JWT bearer. Errors follow RFC7807 (problem+json).
+servers:
+  - url: http://localhost:8080
+    description: API Gateway (local)
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Problem:
+      type: object
+      properties:
+        type: {"type":"string","format":"uri"}
+        title: {"type":"string"}
+        status: {"type":"integer"}
+        detail: {"type":"string"}
+        instance: {"type":"string","format":"uri"}
+    Candle:
+      type: object
+      required: [ts, open, high, low, close, volume, symbol, tf, venue]
+      properties:
+        ts: { type: string, format: date-time }
+        open: { type: number }
+        high: { type: number }
+        low: { type: number }
+        close: { type: number }
+        volume: { type: number }
+        symbol: { type: string }
+        tf: { type: string, example: "1d" }
+        venue: { type: string, example: "NASDAQ" }
+    KPI:
+      type: object
+      properties:
+        pnl: { type: number }
+        sharpe: { type: number }
+        drawdown: { type: number }
+        gross: { type: number }
+        net: { type: number }
+    Position:
+      type: object
+      properties:
+        symbol: { type: string }
+        qty: { type: number }
+        avg_price: { type: number }
+        side: { type: string, enum: ["LONG","SHORT"] }
+        opened_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+    Watchlist:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        user_id: { type: string, format: uuid }
+        created_at: { type: string, format: date-time }
+security:
+  - bearerAuth: []
+
+
+paths:
+  /api/signals:
+    get:
+      summary: Query signals
+      parameters:
+        - in: query
+          name: symbol
+          schema: { type: string }
+        - in: query
+          name: tf
+          schema: { type: string }
+        - in: query
+          name: strategy
+          schema: { type: string }
+        - in: query
+          name: from
+          schema: { type: string, format: date-time }
+        - in: query
+          name: to
+          schema: { type: string, format: date-time }
+      responses:
+        "200":
+          description: Signals
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    symbol: { type: string }
+                    tf: { type: string }
+                    strategy: { type: string }
+                    direction: { type: string, enum: [LONG, SHORT, FLAT] }
+                    score: { type: number }
+                    reason: { type: object }
+                    generated_at: { type: string, format: date-time }
+    post:
+      summary: Ingest third-party signals
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [symbol, tf, strategy, direction, score]
+              properties:
+                symbol: { type: string }
+                tf: { type: string }
+                strategy: { type: string }
+                direction: { type: string, enum: [LONG, SHORT, FLAT] }
+                score: { type: number }
+                reason: { type: object }
+                generated_at: { type: string, format: date-time }
+      responses:
+        "202": { description: Accepted }
+  /api/reports/eod:
+    post:
+      summary: Generate EOD report
+      requestBody:
+        required: false
+      responses:
+        "202": { description: Report generation started }

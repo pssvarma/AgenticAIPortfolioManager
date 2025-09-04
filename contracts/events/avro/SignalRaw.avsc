@@ -1,0 +1,52 @@
+{
+  "type": "record",
+  "name": "SignalRaw",
+  "namespace": "portfolio.events",
+  "fields": [
+    {
+      "name": "symbol",
+      "type": "string"
+    },
+    {
+      "name": "tf",
+      "type": "string"
+    },
+    {
+      "name": "strategy",
+      "type": "string"
+    },
+    {
+      "name": "direction",
+      "type": {
+        "type": "enum",
+        "name": "Direction",
+        "symbols": [
+          "LONG",
+          "SHORT",
+          "FLAT"
+        ]
+      }
+    },
+    {
+      "name": "score",
+      "type": "double"
+    },
+    {
+      "name": "reason",
+      "type": [
+        "null",
+        {
+          "type": "string"
+        }
+      ],
+      "default": null
+    },
+    {
+      "name": "generated_at",
+      "type": {
+        "type": "long",
+        "logicalType": "timestamp-millis"
+      }
+    }
+  ]
+}

@@ -1,0 +1,182 @@
+
+asyncapi: 2.6.0
+info:
+  title: Agentic Portfolio Event Bus
+  version: 1.0.0
+  description: >
+    Kafka topics for market data, signals, simulation orders, risk, alerts, and reports.
+defaultContentType: application/json
+servers:
+  local:
+    url: localhost:9092
+    protocol: kafka
+channels:
+  md.candles.1d:
+    description: Daily bars
+    publish:
+      message:
+        $ref: '#/components/messages/CandleMsg'
+  signals.raw:
+    subscribe:
+      message:
+        $ref: '#/components/messages/SignalRaw'
+    publish:
+      message:
+        $ref: '#/components/messages/SignalRaw'
+  signals.ensemble:
+    publish:
+      message:
+        $ref: '#/components/messages/SignalEnsemble'
+  sim.orders.intent:
+    publish:
+      message:
+        $ref: '#/components/messages/SimOrderIntent'
+  sim.orders.filled:
+    subscribe:
+      message:
+        $ref: '#/components/messages/SimOrderFilled'
+  risk.check.request:
+    publish:
+      message:
+        $ref: '#/components/messages/RiskCheckRequest'
+  risk.check.result:
+    subscribe:
+      message:
+        $ref: '#/components/messages/RiskCheckResult'
+  alerts.events:
+    publish:
+      message:
+        $ref: '#/components/messages/AlertEvent'
+  reports.eod:
+    publish:
+      message:
+        $ref: '#/components/messages/ReportEod'
+components:
+  schemas:
+    Candle:
+      type: object
+      properties:
+        symbol: { type: string }
+        tf: { type: string }
+        venue: { type: string }
+        ts: { type: string, format: date-time }
+        open: { type: number }
+        high: { type: number }
+        low: { type: number }
+        close: { type: number }
+        volume: { type: number }
+    SignalRawPayload:
+      type: object
+      properties:
+        symbol: { type: string }
+        tf: { type: string }
+        strategy: { type: string }
+        direction: { type: string, enum: [LONG, SHORT, FLAT] }
+        score: { type: number }
+        reason: { type: object }
+        generated_at: { type: string, format: date-time }
+    SignalEnsemblePayload:
+      type: object
+      properties:
+        portfolio_id: { type: string, format: uuid }
+        targets:
+          type: array
+          items:
+            type: object
+            properties:
+              symbol: { type: string }
+              weight: { type: number }
+        method: { type: string }
+        metrics: { type: object }
+        asof: { type: string, format: date-time }
+    SimOrderIntentPayload:
+      type: object
+      properties:
+        portfolio_id: { type: string, format: uuid }
+        orders:
+          type: array
+          items:
+            type: object
+            properties:
+              symbol: { type: string }
+              side: { type: string, enum: [BUY, SELL] }
+              qty: { type: number }
+              order_type: { type: string, enum: [MARKET, LIMIT] }
+              limit_price: { type: number }
+              tif: { type: string }
+        requested_at: { type: string, format: date-time }
+    SimOrderFilledPayload:
+      type: object
+      properties:
+        order_id: { type: string, format: uuid }
+        symbol: { type: string }
+        filled_qty: { type: number }
+        fill_price: { type: number }
+        ts: { type: string, format: date-time }
+        model: { type: string }
+        slippage_bps: { type: number }
+    RiskCheckRequestPayload:
+      type: object
+      properties:
+        portfolio_id: { type: string, format: uuid }
+        intent_id: { type: string, format: uuid }
+        exposures: { type: object }
+        ts: { type: string, format: date-time }
+    RiskCheckResultPayload:
+      type: object
+      properties:
+        intent_id: { type: string, format: uuid }
+        status: { type: string, enum: [APPROVED, REJECTED] }
+        reasons: { type: array, items: { type: string } }
+        ts: { type: string, format: date-time }
+    AlertEventPayload:
+      type: object
+      properties:
+        type: { type: string, example: "MDD_BREACH" }
+        portfolio_id: { type: string, format: uuid }
+        detail: { type: string }
+        severity: { type: string, enum: [INFO, WARN, CRIT] }
+        ts: { type: string, format: date-time }
+    ReportEodPayload:
+      type: object
+      properties:
+        portfolio_id: { type: string, format: uuid }
+        location: { type: string, description: "S3/MinIO path" }
+        generated_at: { type: string, format: date-time }
+  messages:
+    CandleMsg:
+      name: CandleMsg
+      payload:
+        $ref: '#/components/schemas/Candle'
+    SignalRaw:
+      name: SignalRaw
+      payload:
+        $ref: '#/components/schemas/SignalRawPayload'
+    SignalEnsemble:
+      name: SignalEnsemble
+      payload:
+        $ref: '#/components/schemas/SignalEnsemblePayload'
+    SimOrderIntent:
+      name: SimOrderIntent
+      payload:
+        $ref: '#/components/schemas/SimOrderIntentPayload'
+    SimOrderFilled:
+      name: SimOrderFilled
+      payload:
+        $ref: '#/components/schemas/SimOrderFilledPayload'
+    RiskCheckRequest:
+      name: RiskCheckRequest
+      payload:
+        $ref: '#/components/schemas/RiskCheckRequestPayload'
+    RiskCheckResult:
+      name: RiskCheckResult
+      payload:
+        $ref: '#/components/schemas/RiskCheckResultPayload'
+    AlertEvent:
+      name: AlertEvent
+      payload:
+        $ref: '#/components/schemas/AlertEventPayload'
+    ReportEod:
+      name: ReportEod
+      payload:
+        $ref: '#/components/schemas/ReportEodPayload'

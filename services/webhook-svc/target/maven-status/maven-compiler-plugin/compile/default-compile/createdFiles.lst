@@ -1,0 +1,3 @@
+com\agentic\portfoliomanager\webhook\controller\WebhookController.class
+com\agentic\portfoliomanager\webhook\model\WebhookSimRequest.class
+com\agentic\portfoliomanager\webhook\WebhookApplication.class

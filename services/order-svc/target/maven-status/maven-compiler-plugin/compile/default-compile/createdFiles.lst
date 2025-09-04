@@ -1,0 +1,9 @@
+com\agentic\portfoliomanager\order\model\events\SimOrderIntent.class
+com\agentic\portfoliomanager\order\model\events\Side.class
+com\agentic\portfoliomanager\order\model\OrderDetail.class
+com\agentic\portfoliomanager\order\model\OrderIntent.class
+com\agentic\portfoliomanager\order\OrderApplication.class
+com\agentic\portfoliomanager\order\model\Order.class
+com\agentic\portfoliomanager\order\model\events\Order.class
+com\agentic\portfoliomanager\order\model\events\OrderType.class
+com\agentic\portfoliomanager\order\controller\OrderController.class
